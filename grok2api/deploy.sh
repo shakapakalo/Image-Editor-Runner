@@ -66,10 +66,10 @@ echo "  Port $PORT is free."
 
 # --- Setup cleanup cron if not already set ---
 chmod +x "$INSTALL_DIR/cleanup.sh" 2>/dev/null || true
-CRON_JOB="*/10 * * * * bash $INSTALL_DIR/cleanup.sh"
+CRON_JOB="*/5 * * * * bash $INSTALL_DIR/cleanup.sh"
 if ! crontab -l 2>/dev/null | grep -q "cleanup.sh"; then
     ( crontab -l 2>/dev/null; echo "$CRON_JOB" ) | crontab -
-    echo "  Auto-cleanup cron added (every 10 min)"
+    echo "  Auto-cleanup cron added (every 5 min, deletes files >20 min old)"
 fi
 
 # --- Check uv ---

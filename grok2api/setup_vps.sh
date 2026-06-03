@@ -56,10 +56,10 @@ EOF
 systemctl daemon-reload
 systemctl enable ${SERVICE_NAME}
 
-# 4. Setup cron — auto delete video/image every 10 minutes
-echo "[4/5] Setting up auto-cleanup cron (every 10 min)..."
+# 4. Setup cron — auto delete video/image older than 20 min (check every 5 min)
+echo "[4/5] Setting up auto-cleanup cron (every 5 min, deletes files >20 min old)..."
 chmod +x "$INSTALL_DIR/cleanup.sh"
-CRON_JOB="*/10 * * * * bash $INSTALL_DIR/cleanup.sh"
+CRON_JOB="*/5 * * * * bash $INSTALL_DIR/cleanup.sh"
 # Add only if not already present
 ( crontab -l 2>/dev/null | grep -v "cleanup.sh" ; echo "$CRON_JOB" ) | crontab -
 echo "  Cron set: $CRON_JOB"
