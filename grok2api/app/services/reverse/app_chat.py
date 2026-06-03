@@ -180,10 +180,16 @@ class AppChatReverse:
                     except Exception:
                         pass
 
-                    logger.debug(
-                        "AppChatReverse: Chat failed response body: %s",
-                        content,
-                    )
+                    if response.status_code == 429:
+                        logger.warning(
+                            "AppChatReverse: 429 response body: %s",
+                            content[:500],
+                        )
+                    else:
+                        logger.debug(
+                            "AppChatReverse: Chat failed response body: %s",
+                            content,
+                        )
                     logger.error(
                         f"AppChatReverse: Chat failed, {response.status_code}",
                         extra={"error_type": "UpstreamException"},

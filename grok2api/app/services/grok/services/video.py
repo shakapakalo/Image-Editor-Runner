@@ -657,6 +657,8 @@ class VideoCollectProcessor(BaseProcessor):
                 logger.error(
                     f"Video collect request error: {e}", extra={"model": self.model}
                 )
+        except UpstreamException:
+            raise
         except Exception as e:
             logger.error(
                 f"Video collect processing error: {e}",
