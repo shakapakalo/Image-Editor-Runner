@@ -1,0 +1,143 @@
+import requests
+import re
+import time
+
+#API_URL = "http://217.77.8.115:8885"  # VPS
+API_URL = "https://7a4b5f8f-32d9-4ff9-b35e-50f362eb79b7-00-1ytwogy841g5r.pike.replit.dev/v1"  # Replit
+API_KEY = "grok2api"
+
+def image_to_video(
+    image_url: str,
+    prompt: str = "",
+
+    # --- Sab Parameters ---
+    aspect_ratio: str = "3:2",   # "16:9" | "9:16" | "3:2" | "2:3" | "1:1"
+    video_length: int = 6,       # 6 | 10 | 15  (seconds)
+    resolution: str = "480p",    # "480p" | "720p"
+    preset: str = "normal",      # "normal" | "fun" | "spicy" | "custom"
+
+    output_path: str = "output.mp4",
+    timeout: int = 600,
+):
+    """
+    Image se video generate karo.
+
+    Parameters:
+        image_url    : Source image ka URL
+        prompt       : Video ke liye description (optional)
+        aspect_ratio : "16:9"=landscape | "9:16"=portrait | "3:2"=default
+                       "2:3"=tall | "1:1"=square
+        video_length : 6, 10, ya 15 seconds
+        resolution   : "480p" ya "720p"
+        preset       : "normal"=standard | "fun"=crazy/funny |
+                       "spicy"=dramatic | "custom"=auto
+        output_path  : Save karne ki jagah
+        timeout      : Max wait time in seconds
+    """
+
+    print(f"Generating video from image...")
+    print(f"  Image     : {image_url[:80]}")
+    print(f"  Prompt    : {prompt or '(none)'}")
+    print(f"  Ratio     : {aspect_ratio}")
+    print(f"  Length    : {video_length}s")
+    print(f"  Resolution: {resolution}")
+    print(f"  Preset    : {preset}")
+
+    response = requests.post(
+        f"{API_URL}/v1/chat/completions",
+        headers={
+            "Authorization": f"Bearer {API_KEY}",
+            "Content-Type": "application/json",
+        },
+        json={
+            "model": "grok-imagine-1.0-video",
+            "messages": [
+                {
+                    "role": "user",
+                    "content": [
+                        # Image URL (required)
+                        {
+                            "type": "image_url",
+                            "image_url": {"url": image_url}
+                        },
+                        # Prompt text (optional)
+                        {
+                            "type": "text",
+                            "text": prompt or "animate this image"
+                        }
+                    ]
+                }
+            ],
+            # Video parameters
+            "video_config": {
+                "aspect_ratio": aspect_ratio,
+                "video_length": video_length,
+                "resolution_name": resolution,
+                "preset": preset,
+            },
+            "stream": False,
+        },
+        timeout=timeout,
+    )
+
+    print(f"\nStatus: {response.status_code}")
+
+    if not response.ok:
+        print(f"Error: {response.text[:300]}")
+        return None
+
+    data = response.json()
+    print(data)
+    content = data["choices"][0]["message"]["content"]
+    print(f"Response preview: {content[:200]}")
+
+    # Video URL extract karo
+    patterns = [
+        r'https?://[^\s\)\]"\']+\.mp4[^\s\)\]"\']*',
+        r'https?://[^\s\)\]"\']+/v1/files/video[^\s\)\]"\']*',
+        r'http://[^\s\)\]"\']+:8885/v1/files/video[^\s\)\]"\']*',
+    ]
+    video_url = None
+    for pattern in patterns:
+        urls = re.findall(pattern, content)
+        if urls:
+            video_url = urls[0]
+            break
+
+    if not video_url:
+        print(f"No video URL found!\nFull content: {content}")
+        return None
+
+    print(f"\nVideo URL: {video_url}")
+
+    # Download
+    print("Downloading...")
+    vid = requests.get(video_url, timeout=120)
+    with open(output_path, "wb") as f:
+        f.write(vid.content)
+
+    size_kb = len(vid.content) // 1024
+    print(f"Saved: {output_path} ({size_kb} KB)")
+    return output_path
+
+
+# ============================================================
+#  EXAMPLES
+# ============================================================
+
+if __name__ == "__main__":
+
+    IMG = "https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Older_Cat_Jasmine_Close_Up.jpg/960px-Older_Cat_Jasmine_Close_Up.jpg"
+
+
+
+    # Example 2 — 720p landscape, 10 seconds, fun mode
+    image_to_video(
+        image_url=IMG,
+        prompt="cat doing crazy dance moves",
+        aspect_ratio="9:16",
+        video_length=6,
+        resolution="720p",
+        preset="fun",
+        output_path="cat_hd_fun.mp4"
+    )
