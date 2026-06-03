@@ -107,7 +107,23 @@ fi
 # Create default config.toml if missing
 if [ ! -f "data/config.toml" ]; then
     cp config.defaults.toml data/config.toml
-    warn "data/config.toml created from defaults — edit as needed"
+    warn "data/config.toml created from defaults"
+fi
+
+# Auto-detect public IP and set app_url
+info "Detecting public IP..."
+PUBLIC_IP=$(curl -sf --max-time 5 https://api.ipify.org \
+    || curl -sf --max-time 5 https://ifconfig.me \
+    || curl -sf --max-time 5 https://icanhazip.com \
+    || hostname -I | awk '{print $1}')
+
+if [ -n "$PUBLIC_IP" ]; then
+    APP_URL="http://${PUBLIC_IP}:${PORT}"
+    # Replace app_url line in config.toml
+    sed -i "s|^app_url = .*|app_url = \"${APP_URL}\"|" data/config.toml
+    success "app_url set to: $APP_URL"
+else
+    warn "Could not detect public IP — set app_url manually in data/config.toml"
 fi
 
 success "Data dirs ready"
