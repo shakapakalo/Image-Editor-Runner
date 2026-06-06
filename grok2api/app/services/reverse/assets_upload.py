@@ -41,12 +41,14 @@ class AssetsUploadReverse:
             else:
                 proxies = {"http": base_proxy, "https": base_proxy}
 
-            # Build headers
+            # Build headers — upload endpoint does not need cf_clearance
+            # (adding cf_clearance to upload causes 403 on datacenter IPs)
             headers = build_headers(
                 cookie_token=token,
                 content_type="application/json",
                 origin="https://grok.com",
                 referer="https://grok.com/",
+                with_cf=False,
             )
 
             # Build payload
@@ -75,9 +77,7 @@ class AssetsUploadReverse:
                     except Exception:
                         body = ""
                     logger.warning(
-                        "AssetsUploadReverse: Upload failed %d body: %s",
-                        response.status_code,
-                        body,
+                        f"AssetsUploadReverse: Upload failed {response.status_code} body: {body}"
                     )
                     logger.error(
                         f"AssetsUploadReverse: Upload failed, {response.status_code}",

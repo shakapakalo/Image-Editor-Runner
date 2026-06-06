@@ -11,12 +11,14 @@ from app.core.config import get_config
 from app.services.reverse.utils.statsig import StatsigGenerator
 
 
-def build_sso_cookie(sso_token: str) -> str:
+def build_sso_cookie(sso_token: str, with_cf: bool = True) -> str:
     """
     Build SSO Cookie string.
 
     Args:
         sso_token: str, the SSO token.
+        with_cf: bool, whether to include cf_clearance cookie. Defaults to True.
+            Set to False for upload endpoints that don't need CF clearance.
 
     Returns:
         str: The SSO Cookie string.
@@ -27,16 +29,17 @@ def build_sso_cookie(sso_token: str) -> str:
     # SSO Cookie
     cookie = f"sso={sso_token}; sso-rw={sso_token}"
 
-    # CF Cookies
-    cf_cookies = get_config("proxy.cf_cookies") or ""
-    if not cf_cookies:
-        cf_clearance = get_config("proxy.cf_clearance")
-        if cf_clearance:
-            cf_cookies = f"cf_clearance={cf_clearance}"
-    if cf_cookies:
-        if cookie and not cookie.endswith(";"):
-            cookie += "; "
-        cookie += cf_cookies
+    if with_cf:
+        # CF Cookies
+        cf_cookies = get_config("proxy.cf_cookies") or ""
+        if not cf_cookies:
+            cf_clearance = get_config("proxy.cf_clearance")
+            if cf_clearance:
+                cf_cookies = f"cf_clearance={cf_clearance}"
+        if cf_cookies:
+            if cookie and not cookie.endswith(";"):
+                cookie += "; "
+            cookie += cf_cookies
 
     return cookie
 
@@ -164,7 +167,7 @@ def build_ws_headers(token: Optional[str] = None, origin: Optional[str] = None, 
     return headers
 
 
-def build_headers(cookie_token: str, content_type: Optional[str] = None, origin: Optional[str] = None, referer: Optional[str] = None) -> Dict[str, str]:
+def build_headers(cookie_token: str, content_type: Optional[str] = None, origin: Optional[str] = None, referer: Optional[str] = None, with_cf: bool = True) -> Dict[str, str]:
     """
     Build headers for reverse interfaces.
 
@@ -173,6 +176,8 @@ def build_headers(cookie_token: str, content_type: Optional[str] = None, origin:
         content_type: Optional[str], the Content-Type value.
         origin: Optional[str], the Origin value. Defaults to "https://grok.com" if not provided.
         referer: Optional[str], the Referer value. Defaults to "https://grok.com/" if not provided.
+        with_cf: bool, whether to include cf_clearance cookie. Defaults to True.
+            Set to False for upload endpoints that don't need CF clearance.
 
     Returns:
         Dict[str, str]: The headers dictionary.
@@ -194,7 +199,7 @@ def build_headers(cookie_token: str, content_type: Optional[str] = None, origin:
         headers.update(client_hints)
 
     # Cookie
-    headers["Cookie"] = build_sso_cookie(cookie_token)
+    headers["Cookie"] = build_sso_cookie(cookie_token, with_cf=with_cf)
 
     # Content-Type and Accept/Sec-Fetch-Dest
     if content_type and content_type == "application/json":
