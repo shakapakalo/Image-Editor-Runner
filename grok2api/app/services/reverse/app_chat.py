@@ -186,9 +186,10 @@ class AppChatReverse:
                             content[:500],
                         )
                     else:
-                        logger.debug(
-                            "AppChatReverse: Chat failed response body: %s",
-                            content,
+                        logger.warning(
+                            "AppChatReverse: Chat failed %d response body: %s",
+                            response.status_code,
+                            content[:1000],
                         )
                     logger.error(
                         f"AppChatReverse: Chat failed, {response.status_code}",

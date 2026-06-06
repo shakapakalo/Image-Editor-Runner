@@ -1,0 +1,41 @@
+v[2369587]: 2026-06-06 10:30:24 | WARNING  | retry.py:201 - Retry 1/3 for status 403, waiting 0.09s (total: 0.09s)
+Jun 06 10:30:24 vmi3086586 uv[2369587]: 2026-06-06 10:30:24 | ERROR    | app_chat.py:193 - AppChatReverse: Chat failed, 403
+Jun 06 10:30:24 vmi3086586 uv[2369587]: 2026-06-06 10:30:24 | WARNING  | retry.py:201 - Retry 2/3 for status 403, waiting 1.07s (total: 1.15s)
+Jun 06 10:30:25 vmi3086586 uv[2369587]: 2026-06-06 10:30:25 | ERROR    | app_chat.py:193 - AppChatReverse: Chat failed, 403
+Jun 06 10:30:25 vmi3086586 uv[2369587]: 2026-06-06 10:30:25 | ERROR    | retry.py:218 - Retry exhausted after 3 attempts, last status: 403, total delay: 1.15s
+Jun 06 10:30:25 vmi3086586 uv[2369587]: 2026-06-06 10:30:25 | WARNING  | exceptions.py:117 - AppException: server_error - AppChatReverse: Chat failed, 403
+Jun 06 10:30:25 vmi3086586 uv[2369587]: 2026-06-06 10:30:25 | INFO     | response_middleware.py:60 - Response: POST /v1/images/edits - 502 (2151.77ms)
+Jun 06 10:30:25 vmi3086586 uv[2369587]: INFO:     82.29.153.39:50598 - "POST /v1/images/edits HTTP/1.1" 502 Bad Gateway
+Jun 06 10:32:26 vmi3086586 uv[2369587]: 2026-06-06 10:32:26 | INFO     | response_middleware.py:44 - Request: POST /v1/admin/config
+Jun 06 10:32:27 vmi3086586 uv[2369587]: 2026-06-06 10:32:27 | INFO     | response_middleware.py:60 - Response: POST /v1/admin/config - 200 (22.81ms)
+Jun 06 10:32:27 vmi3086586 uv[2369587]: INFO:     223.123.54.113:3215 - "POST /v1/admin/config HTTP/1.1" 200 OK
+Jun 06 10:32:58 vmi3086586 uv[2369587]: 2026-06-06 10:32:58 | INFO     | response_middleware.py:44 - Request: POST /v1/images/edits
+Jun 06 10:32:58 vmi3086586 uv[2369587]: 2026-06-06 10:32:58 | INFO     | manager.py:124 - TokenManager initialized: 1 pools with 5 tokens
+Jun 06 10:32:58 vmi3086586 uv[2369587]: 2026-06-06 10:32:58 | WARNING  | manager.py:302 - Pool 'ssoBasic' not found
+Jun 06 10:32:58 vmi3086586 uv[2369587]: 2026-06-06 10:32:58 | INFO     | upload.py:244 - Upload success: file.jpeg -> 60f464be-6540-4755-b719-567f78a41c66
+Jun 06 10:32:59 vmi3086586 uv[2369587]: 2026-06-06 10:32:59 | INFO     | video.py:93 - Media post created: 60f464be-6540-4755-b719-567f78a41c66 (type=MEDIA_POST_TYPE_IMAGE)
+Jun 06 10:32:59 vmi3086586 uv[2369587]: 2026-06-06 10:32:59 | WARNING  | app_chat.py:133 - AppChatReverse proxy is empty, request will use direct network
+Jun 06 10:32:59 vmi3086586 uv[2369587]: 2026-06-06 10:32:59 | ERROR    | app_chat.py:193 - AppChatReverse: Chat failed, 403
+Jun 06 10:32:59 vmi3086586 uv[2369587]: 2026-06-06 10:32:59 | WARNING  | retry.py:201 - Retry 1/3 for status 403, waiting 0.99s (total: 0.99s)
+Jun 06 10:33:00 vmi3086586 uv[2369587]: 2026-06-06 10:33:00 | ERROR    | app_chat.py:193 - AppChatReverse: Chat failed, 403
+Jun 06 10:33:00 vmi3086586 uv[2369587]: 2026-06-06 10:33:00 | WARNING  | retry.py:201 - Retry 2/3 for status 403, waiting 1.23s (total: 2.22s)
+Jun 06 10:33:01 vmi3086586 uv[2369587]: 2026-06-06 10:33:01 | ERROR    | app_chat.py:193 - AppChatReverse: Chat failed, 403
+Jun 06 10:33:01 vmi3086586 uv[2369587]: 2026-06-06 10:33:01 | ERROR    | retry.py:218 - Retry exhausted after 3 attempts, last status: 403, total delay: 2.22s
+Jun 06 10:33:01 vmi3086586 uv[2369587]: 2026-06-06 10:33:01 | WARNING  | exceptions.py:117 - AppException: server_error - AppChatReverse: Chat failed, 403
+Jun 06 10:33:01 vmi3086586 uv[2369587]: 2026-06-06 10:33:01 | INFO     | response_middleware.py:60 - Response: POST /v1/images/edits - 502 (3195.72ms)
+Jun 06 10:33:01 vmi3086586 uv[2369587]: INFO:     82.29.153.39:39194 - "POST /v1/images/edits HTTP/1.1" 502 Bad Gateway
+Jun 06 10:33:04 vmi3086586 uv[2369587]: 2026-06-06 10:33:04 | INFO     | response_middleware.py:44 - Request: POST /v1/images/edits
+Jun 06 10:33:04 vmi3086586 uv[2369587]: 2026-06-06 10:33:04 | WARNING  | manager.py:302 - Pool 'ssoBasic' not found
+Jun 06 10:33:04 vmi3086586 uv[2369587]: 2026-06-06 10:33:04 | INFO     | upload.py:244 - Upload success: file.jpeg -> 72c92c69-07f0-4fde-b562-20e1de8c846e
+Jun 06 10:33:04 vmi3086586 uv[2369587]: 2026-06-06 10:33:04 | INFO     | video.py:93 - Media post created: 72c92c69-07f0-4fde-b562-20e1de8c846e (type=MEDIA_POST_TYPE_IMAGE)
+Jun 06 10:33:04 vmi3086586 uv[2369587]: 2026-06-06 10:33:04 | WARNING  | app_chat.py:133 - AppChatReverse proxy is empty, request will use direct network
+Jun 06 10:33:05 vmi3086586 uv[2369587]: 2026-06-06 10:33:05 | ERROR    | app_chat.py:193 - AppChatReverse: Chat failed, 403
+Jun 06 10:33:05 vmi3086586 uv[2369587]: 2026-06-06 10:33:05 | WARNING  | retry.py:201 - Retry 1/3 for status 403, waiting 0.53s (total: 0.53s)
+Jun 06 10:33:05 vmi3086586 uv[2369587]: 2026-06-06 10:33:05 | ERROR    | app_chat.py:193 - AppChatReverse: Chat failed, 403
+Jun 06 10:33:05 vmi3086586 uv[2369587]: 2026-06-06 10:33:05 | WARNING  | retry.py:201 - Retry 2/3 for status 403, waiting 1.00s (total: 1.53s)
+Jun 06 10:33:06 vmi3086586 uv[2369587]: 2026-06-06 10:33:06 | ERROR    | app_chat.py:193 - AppChatReverse: Chat failed, 403
+Jun 06 10:33:06 vmi3086586 uv[2369587]: 2026-06-06 10:33:06 | ERROR    | retry.py:218 - Retry exhausted after 3 attempts, last status: 403, total delay: 1.53s
+Jun 06 10:33:06 vmi3086586 uv[2369587]: 2026-06-06 10:33:06 | WARNING  | exceptions.py:117 - AppException: server_error - AppChatReverse: Chat failed, 403
+Jun 06 10:33:06 vmi3086586 uv[2369587]: 2026-06-06 10:33:06 | INFO     | response_middleware.py:60 - Response: POST /v1/images/edits - 502 (2474.18ms)
+Jun 06 10:33:06 vmi3086586 uv[2369587]: INFO:     82.29.153.39:44478 - "POST /v1/images/edits HTTP/1.1" 502 Bad Gateway
+root@vmi3086586:~#
