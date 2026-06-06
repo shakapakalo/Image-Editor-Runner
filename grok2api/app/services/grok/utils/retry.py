@@ -43,6 +43,18 @@ def rate_limited(error: Exception) -> bool:
     return status == 429 or code == "rate_limit_exceeded"
 
 
+def is_anti_bot(error: Exception) -> bool:
+    """Return True when upstream rejected the request with anti-bot rules (HTTP 403)."""
+    if not isinstance(error, UpstreamException):
+        return False
+    details = error.details or {}
+    status = details.get("status")
+    if status == 403:
+        return True
+    body = str(details.get("body") or "").lower()
+    return "anti-bot" in body or "request rejected" in body
+
+
 def transient_upstream(error: Exception) -> bool:
     """Whether error is likely transient and safe to retry with another token."""
     if not isinstance(error, UpstreamException):
@@ -63,4 +75,4 @@ def transient_upstream(error: Exception) -> bool:
     return any(marker in err for marker in timeout_markers)
 
 
-__all__ = ["pick_token", "rate_limited", "transient_upstream"]
+__all__ = ["pick_token", "rate_limited", "is_anti_bot", "transient_upstream"]

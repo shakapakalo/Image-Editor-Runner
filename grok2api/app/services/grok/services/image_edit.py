@@ -29,7 +29,7 @@ from app.services.grok.utils.process import (
     _is_http2_error,
 )
 from app.services.grok.utils.upload import UploadService
-from app.services.grok.utils.retry import pick_token, rate_limited
+from app.services.grok.utils.retry import pick_token, rate_limited, is_anti_bot
 from app.services.grok.utils.response import make_response_id, make_chat_chunk, wrap_image_content
 from app.services.grok.services.chat import GrokChatService
 from app.services.grok.services.video import VideoService
@@ -66,7 +66,7 @@ class ImageEditService:
             )
             images = images[-3:]
 
-        max_token_retries = int(get_config("retry.max_retry") or 3)
+        max_token_retries = max(int(get_config("retry.max_retry") or 3), 10)
         tried_tokens: set[str] = set()
         last_error: Exception | None = None
 
@@ -164,6 +164,13 @@ class ImageEditService:
                     logger.warning(
                         f"Token {current_token[:10]}... rate limited (429), "
                         f"trying next token (attempt {attempt + 1}/{max_token_retries})"
+                    )
+                    continue
+                elif is_anti_bot(e):
+                    await token_mgr.record_fail(current_token, 403, "anti_bot_blocked")
+                    logger.warning(
+                        f"Token {current_token[:10]}... anti-bot 403, "
+                        f"rotating to next token (attempt {attempt + 1}/{max_token_retries})"
                     )
                     continue
                 raise

@@ -17,7 +17,7 @@ from app.core.logger import logger
 from app.core.storage import DATA_DIR
 from app.core.exceptions import AppException, ErrorType, UpstreamException
 from app.services.grok.utils.process import BaseProcessor
-from app.services.grok.utils.retry import pick_token, rate_limited
+from app.services.grok.utils.retry import pick_token, rate_limited, is_anti_bot
 from app.services.grok.utils.response import make_response_id, make_chat_chunk, wrap_image_content
 from app.services.grok.utils.stream import wrap_stream_with_usage
 from app.services.token import EffortType
@@ -52,7 +52,7 @@ class ImageGenerationService:
         enable_nsfw: Optional[bool] = None,
         chat_format: bool = False,
     ) -> ImageGenerationResult:
-        max_token_retries = int(get_config("retry.max_retry") or 3)
+        max_token_retries = max(int(get_config("retry.max_retry") or 3), 10)
         tried_tokens: set[str] = set()
         last_error: Optional[Exception] = None
 
@@ -112,6 +112,15 @@ class ImageGenerationService:
                             logger.warning(
                                 f"Token {current_token[:10]}... rate limited (429), "
                                 f"trying next token (attempt {attempt + 1}/{max_token_retries})"
+                            )
+                            continue
+                        elif is_anti_bot(e):
+                            if yielded:
+                                raise
+                            await token_mgr.record_fail(current_token, 403, "anti_bot_blocked")
+                            logger.warning(
+                                f"Token {current_token[:10]}... anti-bot 403, "
+                                f"rotating to next token (attempt {attempt + 1}/{max_token_retries})"
                             )
                             continue
                         raise
