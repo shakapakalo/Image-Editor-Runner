@@ -70,6 +70,15 @@ class AssetsUploadReverse:
                     impersonate=browser,
                 )
                 if response.status_code != 200:
+                    try:
+                        body = response.text[:500]
+                    except Exception:
+                        body = ""
+                    logger.warning(
+                        "AssetsUploadReverse: Upload failed %d body: %s",
+                        response.status_code,
+                        body,
+                    )
                     logger.error(
                         f"AssetsUploadReverse: Upload failed, {response.status_code}",
                         extra={"error_type": "UpstreamException"},
