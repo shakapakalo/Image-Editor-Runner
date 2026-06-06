@@ -1,0 +1,101 @@
+ create mode 100644 attached_assets/tokens_export_selected_2026-06-06_1780735186269.txt
+ERROR: AssetsUploadReverse: Upload failed, 403
+root@vmi3086586:~/Image-Editor-Runner# # Step 1: Get fresh cf_clearance from FlareSolverr (VPS IP)
+CF=$(curl -s -X POST http://localhost:8191/v1 \
+  -H "Content-Type: application/json" \
+  -d '{"cmd":"request.get","url":"https://grok.com","maxTimeout":60000}' | \
+  python3 -c "
+import sys,json
+d=json.load(sys.stdin)
+s=d.get('solution',{})
+cf=next((c['value'] for c in s.get('cookies',[]) if c['name']=='cf_clearance'),'')
+ua=s.get('userAgent','')
+print('CF:'+cf)
+print('UA:'+ua)
+")
+CF_VAL=$(echo "$CF" | grep '^CF:' | cut -c4-)
+UA_VAL=$(echo "$CF" | grep '^UA:' | cut -c4-)
+echo "cf_clearance: ${CF_VAL:0:40}..."
+echo "user_agent:   ${UA_VAL:0:60}..."
+cf_clearance: s._ELxT0ohtV2gQ2nsZsY8r98eE_l67oQXLuRDPC...
+user_agent:   Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, l...
+root@vmi3086586:~/Image-Editor-Runner# # Step 2: Update config.toml with fresh values
+CONF=/root/Image-Editor-Runner/grok2api/data/config.toml
+sed -i "s|^cf_clearance = .*|cf_clearance = \"$CF_VAL\"|" $CONF
+[ -n "$UA_VAL" ] && sed -i "s|^user_agent = .*|user_agent = \"$UA_VAL\"|" $CONF
+echo "=== Config after update ==="
+grep -E "cf_clearance|user_agent|browser" $CONF
+=== Config after update ===
+cf_clearance = "s._ELxT0ohtV2gQ2nsZsY8r98eE_l67oQXLuRDPC0ek-1780738081-1.2.1.1-l4R1y4HKF0W1614WGglKc1OyIi0QMKEU_7fpIVyD9cSBgUShuJAxXZn_3_QVBRCN2S6lb60bx3Mgh9BaeEslSlfnm1SW0vviJMzFRKOYdUKKhHC5eHOzylW3OWRQPGki_fzjCiGwwwg6HKndJtBf34MzLSLVlmuOPMpih14Jcc4iXrYafmh5z3Kqln6hT..4JnvNd6AiY_MLYxVjvYnECXVkZouh1AOEYb6XPcxdH1.jG.CxBebi0OYoIpDO.QjPF9bDgyFOllsrPWwsBfWW0HR2SC0t29AR8aFiqin46yWx.2AxRGoxsGiLCvC0jg2V9FU0uEILFaIlg6iry7odiA"
+browser = "chrome142"
+user_agent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+cf_cookies = "OptanonConsent=isGpcEnabled=0&datestamp=Sat+Jun+06+2026+09%3A25%3A24+GMT%2B0000+(Coordinated+Universal+Time)&version=202603.1.0&browserGpcFlag=0&isIABGlobal=false&hosts=&landingPath=https%3A%2F%2Fgrok.com%2F&groups=C0001%3A1%2CC0004%3A1%2CC0002%3A1; __cf_bm=4yr4OebWk5VVcg_Ymq0TGhbt7aalZCP4UedbrZKslDY-1780737921.1395395-1.0.1.1-c59237B2k9zLZyssGjjUMWhj88BVSZJGN0zqCTdOv8wydK4RFB8gVkNDHTiOeeyB1ImJz4RxMy9I_lns0aZi01Ri.lvnifewZu1x8oyayFPUIoASRsbODsf9Mpl9s3B6; i18nextLng=en; mp_ea93da913ddb66b6372b89d97b1029ac_mixpanel=%7B%22distinct_id%22%3A%22%24device%3A79a6b73d-b4a1-40b1-b259-a30588a4c6f6%22%2C%22%24device_id%22%3A%2279a6b73d-b4a1-40b1-b259-a30588a4c6f6%22%2C%22%24initial_referrer%22%3A%22%24direct%22%2C%22%24initial_referring_domain%22%3A%22%24direct%22%2C%22__mps%22%3A%7B%22%24os%22%3A%22Linux%22%2C%22%24browser%22%3A%22Chrome%22%2C%22%24browser_version%22%3A142%2C%22country%22%3A%22US%22%2C%22user_segment%22%3A%22consumer%22%7D%2C%22__mpso%22%3A%7B%22%24initial_referrer%22%3A%22%24direct%22%2C%22%24initial_referring_domain%22%3A%22%24direct%22%7D%2C%22__mpus%22%3A%7B%7D%2C%22__mpa%22%3A%7B%7D%2C%22__mpu%22%3A%7B%7D%2C%22__mpr%22%3A%5B%5D%2C%22__mpap%22%3A%5B%5D%7D; cf_clearance=si1JYfruDMav5sJyr.KJIDaAXjPrXXysKBowa_E4ips-1780737921-1.2.1.1-TDm5.TggCFAY.mj1NtVSfgbsBudjw9kKVuN6XqCwA_nGYtFX47DFELm1uJhYOh2W245d82zkhlCEvugoNPtYeb682XAWzES9No0ASGN0iFadUVxSJgSWloRQ0XY28VorCh3_aQ28gf72Zn..9FALXXbMjIQ9IG9agHIUJOlS9R5GklzDap_4QS_yBvqHmKtUgrc53lzV7W4n1pWWgEM1jF2GegH6LSp4vctJS5aeoumimoOVUBayYUYlvf0c666Fb0WbAmZ8j7Kv9vxLQrOoXH47EqQpjoToM6FKUwnfFXqOtEabPYnQW9U7fno04dFfZpxEQ3p49qY0T08x61fXxA; grok_device_id=8a0fe858-ee15-4d5a-b3c1-6e725b707ca4"
+root@vmi3086586:~/Image-Editor-Runner# # Step 3: Restart + test
+systemctl restart grok2api && sleep 5
+
+curl -s -X POST http://localhost:8885/v1/images/edits \
+  -H "Authorization: Bearer ranaji" \
+  -F "model=grok-imagine-1.0-edit" \
+  -F "prompt=make background blue" \
+  -F "image=@/tmp/t.jpg" | python3 -c "
+import sys,json
+d=json.load(sys.stdin)
+if 'error' in d: print('ERROR:', d['error']['message'][:200])
+else: print('SUCCESS:', d.get('data',[{}])[0].get('url','')[:80])
+"
+ERROR: AssetsUploadReverse: Upload failed, 403
+root@vmi3086586:~/Image-Editor-Runner# # Check if scheduler is refreshing cf_clearance automatically
+journalctl -u grok2api --since "1 hour ago" | grep -E "Scheduler|cf_refresh|FlareSolverr"
+grep -E "flaresolverr|cf_refresh" /root/Image-Editor-Runner/grok2api/data/config.toml
+Jun 06 10:45:25 vmi3086586 uv[2369587]: 2026-06-06 10:45:25 | INFO     | scheduler.py:98 - cf_refresh background task stopped
+Jun 06 10:45:25 vmi3086586 uv[2369587]: 2026-06-06 10:45:25 | INFO     | scheduler.py:94 - Scheduler: stopped
+Jun 06 10:45:27 vmi3086586 uv[1789760]: 2026-06-06 10:45:27 | INFO     | scheduler.py:84 - Scheduler: enabled
+Jun 06 10:45:27 vmi3086586 uv[1789760]: 2026-06-06 10:45:27 | INFO     | scheduler.py:89 - cf_refresh background task started
+Jun 06 10:45:27 vmi3086586 uv[1789760]: 2026-06-06 10:45:27 | INFO     | scheduler.py:22 - Scheduler: started (interval: 2h)
+Jun 06 10:45:27 vmi3086586 uv[1789760]: 2026-06-06 10:45:27 | INFO     | scheduler.py:50 - Scheduler: starting token refresh...
+Jun 06 10:45:27 vmi3086586 uv[1789760]: 2026-06-06 10:45:27 | INFO     | scheduler.py:69 - cf_refresh scheduler started (FlareSolverr: http://localhost:8191, interval: 3600s)
+Jun 06 10:45:27 vmi3086586 uv[1789760]: 2026-06-06 10:45:27 | INFO     | scheduler.py:54 - Scheduler: refresh completed - checked=0, refreshed=0, recovered=0, expired=0
+Jun 06 10:51:58 vmi3086586 uv[1789760]: 2026-06-06 10:51:58 | INFO     | scheduler.py:98 - cf_refresh background task stopped
+Jun 06 10:51:58 vmi3086586 uv[1789760]: 2026-06-06 10:51:58 | INFO     | scheduler.py:94 - Scheduler: stopped
+Jun 06 10:51:59 vmi3086586 uv[1835378]: 2026-06-06 10:51:59 | INFO     | scheduler.py:84 - Scheduler: enabled
+Jun 06 10:51:59 vmi3086586 uv[1835378]: 2026-06-06 10:51:59 | INFO     | scheduler.py:89 - cf_refresh background task started
+Jun 06 10:51:59 vmi3086586 uv[1835378]: 2026-06-06 10:51:59 | INFO     | scheduler.py:22 - Scheduler: started (interval: 2h)
+Jun 06 10:51:59 vmi3086586 uv[1835378]: 2026-06-06 10:51:59 | INFO     | scheduler.py:50 - Scheduler: starting token refresh...
+Jun 06 10:51:59 vmi3086586 uv[1835378]: 2026-06-06 10:51:59 | INFO     | scheduler.py:69 - cf_refresh scheduler started (FlareSolverr: http://localhost:8191, interval: 3600s)
+Jun 06 10:51:59 vmi3086586 uv[1835378]: 2026-06-06 10:51:59 | INFO     | scheduler.py:54 - Scheduler: refresh completed - checked=0, refreshed=0, recovered=0, expired=0
+Jun 06 10:52:28 vmi3086586 uv[1835378]: 2026-06-06 10:52:28 | INFO     | scheduler.py:98 - cf_refresh background task stopped
+Jun 06 10:52:28 vmi3086586 uv[1835378]: 2026-06-06 10:52:28 | INFO     | scheduler.py:94 - Scheduler: stopped
+Jun 06 10:52:29 vmi3086586 uv[1838918]: 2026-06-06 10:52:29 | INFO     | scheduler.py:84 - Scheduler: enabled
+Jun 06 10:52:29 vmi3086586 uv[1838918]: 2026-06-06 10:52:29 | INFO     | scheduler.py:89 - cf_refresh background task started
+Jun 06 10:52:29 vmi3086586 uv[1838918]: 2026-06-06 10:52:29 | INFO     | scheduler.py:22 - Scheduler: started (interval: 2h)
+Jun 06 10:52:29 vmi3086586 uv[1838918]: 2026-06-06 10:52:29 | INFO     | scheduler.py:50 - Scheduler: starting token refresh...
+Jun 06 10:52:29 vmi3086586 uv[1838918]: 2026-06-06 10:52:29 | INFO     | scheduler.py:69 - cf_refresh scheduler started (FlareSolverr: http://localhost:8191, interval: 3600s)
+Jun 06 10:52:29 vmi3086586 uv[1838918]: 2026-06-06 10:52:29 | INFO     | scheduler.py:54 - Scheduler: refresh completed - checked=0, refreshed=0, recovered=0, expired=0
+Jun 06 10:53:45 vmi3086586 uv[1838918]: 2026-06-06 10:53:45 | INFO     | scheduler.py:98 - cf_refresh background task stopped
+Jun 06 10:53:45 vmi3086586 uv[1838918]: 2026-06-06 10:53:45 | INFO     | scheduler.py:94 - Scheduler: stopped
+Jun 06 10:53:47 vmi3086586 uv[1847953]: 2026-06-06 10:53:47 | INFO     | scheduler.py:84 - Scheduler: enabled
+Jun 06 10:53:47 vmi3086586 uv[1847953]: 2026-06-06 10:53:47 | INFO     | scheduler.py:89 - cf_refresh background task started
+Jun 06 10:53:47 vmi3086586 uv[1847953]: 2026-06-06 10:53:47 | INFO     | scheduler.py:22 - Scheduler: started (interval: 2h)
+Jun 06 10:53:47 vmi3086586 uv[1847953]: 2026-06-06 10:53:47 | INFO     | scheduler.py:50 - Scheduler: starting token refresh...
+Jun 06 10:53:47 vmi3086586 uv[1847953]: 2026-06-06 10:53:47 | INFO     | scheduler.py:69 - cf_refresh scheduler started (FlareSolverr: http://localhost:8191, interval: 3600s)
+Jun 06 10:53:47 vmi3086586 uv[1847953]: 2026-06-06 10:53:47 | INFO     | solver.py:74 - 正在通过 FlareSolverr 访问 https://grok.com ...
+Jun 06 10:53:47 vmi3086586 uv[1847953]: 2026-06-06 10:53:47 | INFO     | scheduler.py:54 - Scheduler: refresh completed - checked=0, refreshed=0, recovered=0, expired=0
+Jun 06 11:25:15 vmi3086586 uv[1847953]: 2026-06-06 11:25:15 | INFO     | scheduler.py:98 - cf_refresh background task stopped
+Jun 06 11:25:15 vmi3086586 uv[1847953]: 2026-06-06 11:25:15 | INFO     | scheduler.py:94 - Scheduler: stopped
+Jun 06 11:25:17 vmi3086586 uv[2066668]: 2026-06-06 11:25:17 | INFO     | scheduler.py:84 - Scheduler: enabled
+Jun 06 11:25:17 vmi3086586 uv[2066668]: 2026-06-06 11:25:17 | INFO     | scheduler.py:89 - cf_refresh background task started
+Jun 06 11:25:17 vmi3086586 uv[2066668]: 2026-06-06 11:25:17 | INFO     | scheduler.py:22 - Scheduler: started (interval: 2h)
+Jun 06 11:25:17 vmi3086586 uv[2066668]: 2026-06-06 11:25:17 | INFO     | scheduler.py:50 - Scheduler: starting token refresh...
+Jun 06 11:25:17 vmi3086586 uv[2066668]: 2026-06-06 11:25:17 | INFO     | scheduler.py:69 - cf_refresh scheduler started (FlareSolverr: http://localhost:8191, interval: 3600s)
+Jun 06 11:25:17 vmi3086586 uv[2066668]: 2026-06-06 11:25:17 | INFO     | solver.py:74 - 正在通过 FlareSolverr 访问 https://grok.com ...
+Jun 06 11:25:17 vmi3086586 uv[2066668]: 2026-06-06 11:25:17 | INFO     | scheduler.py:54 - Scheduler: refresh completed - checked=0, refreshed=0, recovered=0, expired=0
+Jun 06 11:28:35 vmi3086586 uv[2066668]: 2026-06-06 11:28:35 | INFO     | scheduler.py:98 - cf_refresh background task stopped
+Jun 06 11:28:35 vmi3086586 uv[2066668]: 2026-06-06 11:28:35 | INFO     | scheduler.py:94 - Scheduler: stopped
+Jun 06 11:28:36 vmi3086586 uv[2089941]: 2026-06-06 11:28:36 | INFO     | scheduler.py:84 - Scheduler: enabled
+Jun 06 11:28:36 vmi3086586 uv[2089941]: 2026-06-06 11:28:36 | INFO     | scheduler.py:89 - cf_refresh background task started
+Jun 06 11:28:36 vmi3086586 uv[2089941]: 2026-06-06 11:28:36 | INFO     | scheduler.py:22 - Scheduler: started (interval: 2h)
+Jun 06 11:28:36 vmi3086586 uv[2089941]: 2026-06-06 11:28:36 | INFO     | scheduler.py:50 - Scheduler: starting token refresh...
+Jun 06 11:28:36 vmi3086586 uv[2089941]: 2026-06-06 11:28:36 | INFO     | scheduler.py:69 - cf_refresh scheduler started (FlareSolverr: http://localhost:8191, interval: 3600s)
+Jun 06 11:28:37 vmi3086586 uv[2089941]: 2026-06-06 11:28:37 | INFO     | solver.py:74 - 正在通过 FlareSolverr 访问 https://grok.com ...
+Jun 06 11:28:37 vmi3086586 uv[2089941]: 2026-06-06 11:28:37 | INFO     | scheduler.py:54 - Scheduler: refresh completed - checked=0, refreshed=0, recovered=0, expired=0
+flaresolverr_url = "http://localhost:8191"
